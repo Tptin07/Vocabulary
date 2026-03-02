@@ -2,7 +2,7 @@
   "words": [
     {
       "id": 9,
-      "term": "nǐ hǎo",
+      "term": "你好 /nǐ hǎo/",
       "definition": "Xin chào",
       "example": "",
       "category": "General",
@@ -10,14 +10,22 @@
     },
     {
       "id": 10,
-      "term": "zǎoshang hǎo",
+      "term": "早上好  /zǎoshang hǎo/",
       "definition": "Chào buổi sáng",
       "example": "",
       "category": "General",
       "created_at": "2026-03-02 07:06:19"
+    },
+    {
+      "id": 12,
+      "term": "中午好   /zhōngwǔ hǎo/",
+      "definition": "Chào buổi trưa",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:17:27"
     }
   ],
   "testResults": [],
-  "nextWordId": 11,
+  "nextWordId": 13,
   "nextTestId": 1
 }

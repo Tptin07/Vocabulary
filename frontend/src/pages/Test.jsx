@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getWords, saveTestResult } from "../api";
+import { SpeakButton } from "../hooks/useSpeech";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -359,6 +360,16 @@ export default function Test() {
           {q.word.category && (
             <span className="badge badge-purple">{q.word.category}</span>
           )}
+          <div style={{ marginTop: 14 }}>
+            <SpeakButton
+              text={q.word.term}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            />
+          </div>
         </div>
 
         <div

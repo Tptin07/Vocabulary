@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getWords } from "../api";
+import { useSpeech, SpeakButton } from "../hooks/useSpeech";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -19,6 +20,7 @@ export default function Flashcard() {
   const [loading, setLoading] = useState(true);
   const [phase, setPhase] = useState("study"); // study | result
   const [shuffled, setShuffled] = useState(false);
+  const { speak } = useSpeech();
 
   useEffect(() => {
     getWords()
@@ -31,7 +33,16 @@ export default function Flashcard() {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleFlip = () => setFlipped((f) => !f);
+  const handleFlip = () => {
+    setFlipped((f) => !f);
+  };
+
+  // Auto-speak term when moving to a new card
+  useEffect(() => {
+    if (cards.length > 0 && phase === "study") {
+      speak(cards[current].term);
+    }
+  }, [current, cards, phase]);
 
   const handleKnow = (val) => {
     const newKnown = new Set(known);
@@ -235,12 +246,29 @@ export default function Flashcard() {
               )}
               <div
                 style={{
-                  marginTop: 20,
-                  color: "var(--text-muted)",
-                  fontSize: "0.8rem",
+                  marginTop: 16,
+                  display: "flex",
+                  gap: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                Nhấn để xem định nghĩa →
+                <SpeakButton
+                  text={card.term}
+                  style={{
+                    background: "rgba(255,255,255,0.15)",
+                    color: "#fff",
+                    border: "1px solid rgba(255,255,255,0.25)",
+                  }}
+                />
+                <span
+                  style={{
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "0.78rem",
+                  }}
+                >
+                  Nhấn thẻ để xem nghĩa →
+                </span>
               </div>
             </div>
             <div className="flashcard-face flashcard-back">

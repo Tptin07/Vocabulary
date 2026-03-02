@@ -6,6 +6,7 @@ import {
   deleteWord,
   getCategories,
 } from "../api";
+import { SpeakButton } from "../hooks/useSpeech";
 
 const CATEGORIES = [
   "General",
@@ -318,7 +319,17 @@ export default function WordManager({ onWordChange }) {
                   marginBottom: 6,
                 }}
               >
-                <div className="word-card-term">{word.term}</div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div className="word-card-term">{word.term}</div>
+                  <SpeakButton text={word.term} />
+                </div>
                 <span className="badge badge-purple">{word.category}</span>
               </div>
               <div className="word-card-def">{word.definition}</div>
