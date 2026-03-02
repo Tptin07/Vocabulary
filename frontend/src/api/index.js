@@ -19,4 +19,10 @@ export const getTestResults = () => api.get("/test-results");
 export const getTestStats = () => api.get("/test-results/stats");
 export const saveTestResult = (data) => api.post("/test-results", data);
 
+// Dictionary
+export const dictEN = (word) => api.get(`/dict/en/${encodeURIComponent(word)}`);
+export const dictZH = (word) => api.get(`/dict/zh/${encodeURIComponent(word)}`);
+export const translate = (q, sl = "auto", tl = "vi") =>
+  api.get("/dict/translate", { params: { q, sl, tl } });
+
 export default api;

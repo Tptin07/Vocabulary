@@ -23,9 +23,81 @@
       "example": "",
       "category": "General",
       "created_at": "2026-03-02 07:17:27"
+    },
+    {
+      "id": 13,
+      "term": "下午好   /xiàwǔ hǎo/",
+      "definition": "Chào buổi chiều",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:21:41"
+    },
+    {
+      "id": 14,
+      "term": "晚上好   /wǎnshàng hǎo/",
+      "definition": "Chào buổi tối",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:23:12"
+    },
+    {
+      "id": 15,
+      "term": "你 /nǐ/",
+      "definition": "Bạn",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:31:26"
+    },
+    {
+      "id": 16,
+      "term": "我 /Wǒmen/",
+      "definition": "Chúng tôi",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:33:54"
+    },
+    {
+      "id": 17,
+      "term": "他 [ tā ]",
+      "definition": "Anh ấy, cô ấy",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:36:07"
+    },
+    {
+      "id": 18,
+      "term": "他们  /tāmen/",
+      "definition": "Bọn họ",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:36:49"
+    },
+    {
+      "id": 19,
+      "term": "好 /hǎo/",
+      "definition": "Tốt",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:37:43"
+    },
+    {
+      "id": 20,
+      "term": "谢谢 /xièxie/",
+      "definition": "Cảm ơn",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:38:18"
+    },
+    {
+      "id": 21,
+      "term": "不客气  /bù kèqi/",
+      "definition": "Đừng khách sáo",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:39:16"
     }
   ],
   "testResults": [],
-  "nextWordId": 13,
+  "nextWordId": 22,
   "nextTestId": 1
 }

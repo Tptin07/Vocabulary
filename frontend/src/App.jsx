@@ -5,6 +5,7 @@ import Practice from "./pages/Practice";
 import Test from "./pages/Test";
 import Flashcard from "./pages/Flashcard";
 import History from "./pages/History";
+import Dictionary from "./pages/Dictionary";
 import { getWords } from "./api";
 import { SpeechLangProvider, LanguagePicker } from "./hooks/useSpeech";
 
@@ -13,6 +14,7 @@ const navItems = [
   { to: "/practice", icon: "🎯", label: "Luyện Tập" },
   { to: "/test", icon: "⏱️", label: "Kiểm Tra" },
   { to: "/flashcard", icon: "🃏", label: "Flashcard" },
+  { to: "/dict", icon: "🔍", label: "Từ Điển" },
   { to: "/history", icon: "📅", label: "Lịch Sử" },
 ];
 
@@ -67,6 +69,7 @@ function AppInner() {
           <Route path="/practice" element={<Practice />} />
           <Route path="/test" element={<Test />} />
           <Route path="/flashcard" element={<Flashcard />} />
+          <Route path="/dict" element={<Dictionary />} />
           <Route path="/history" element={<History />} />
         </Routes>
       </main>

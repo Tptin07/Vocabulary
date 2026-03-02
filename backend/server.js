@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const wordsRouter = require("./routes/words");
 const testResultsRouter = require("./routes/testResults");
+const dictRouter = require("./routes/dict");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/words", wordsRouter);
 app.use("/api/test-results", testResultsRouter);
+app.use("/api/dict", dictRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
