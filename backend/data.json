@@ -1,0 +1,23 @@
+{
+  "words": [
+    {
+      "id": 9,
+      "term": "nǐ hǎo",
+      "definition": "Xin chào",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:05:13"
+    },
+    {
+      "id": 10,
+      "term": "zǎoshang hǎo",
+      "definition": "Chào buổi sáng",
+      "example": "",
+      "category": "General",
+      "created_at": "2026-03-02 07:06:19"
+    }
+  ],
+  "testResults": [],
+  "nextWordId": 11,
+  "nextTestId": 1
+}

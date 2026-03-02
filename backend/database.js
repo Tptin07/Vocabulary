@@ -1,114 +1,229 @@
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const DB_PATH = path.join(__dirname, 'vocab.db');
+const DB_PATH = path.join(__dirname, "data.json");
 
-let db = null;
-
-function getDB() {
-  return db;
+// Default data structure
+function emptyDB() {
+  return { words: [], testResults: [], nextWordId: 1, nextTestId: 1 };
 }
 
-async function initDB() {
-  const SQL = await initSqlJs();
-
-  // Load existing DB file if it exists
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-  }
-
-  // Enable foreign keys
-  db.run('PRAGMA foreign_keys = ON;');
-
-  // Create tables
-  db.run(`
-    CREATE TABLE IF NOT EXISTS words (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      term TEXT NOT NULL,
-      definition TEXT NOT NULL,
-      example TEXT DEFAULT '',
-      category TEXT DEFAULT 'General',
-      created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
-    );
-  `);
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS test_results (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      score INTEGER NOT NULL,
-      total INTEGER NOT NULL,
-      duration INTEGER NOT NULL,
-      mode TEXT NOT NULL DEFAULT 'test',
-      created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
-    );
-  `);
-
-  // Seed sample data if empty
-  const result = db.exec('SELECT COUNT(*) as cnt FROM words');
-  const cnt = result.length > 0 ? result[0].values[0][0] : 0;
-
-  if (cnt === 0) {
-    const sampleWords = [
-      ['Ephemeral', 'Lasting for a very short time', 'The ephemeral beauty of cherry blossoms.', 'Adjective'],
-      ['Ubiquitous', 'Present everywhere at the same time', 'Smartphones have become ubiquitous in modern life.', 'Adjective'],
-      ['Resilient', 'Able to recover quickly from difficulties', 'She is a resilient person who never gives up.', 'Adjective'],
-      ['Eloquent', 'Fluent or persuasive in speaking or writing', 'The lawyer made an eloquent argument.', 'Adjective'],
-      ['Benevolent', 'Well-meaning and kindly', 'A benevolent leader cares for his people.', 'Adjective'],
-      ['Ambiguous', 'Open to more than one interpretation', 'The instructions were ambiguous and confusing.', 'Adjective'],
-      ['Diligent', 'Having or showing care and effort', 'She was diligent in her studies.', 'Adjective'],
-      ['Pragmatic', 'Dealing with things sensibly and realistically', 'A pragmatic approach to problem solving.', 'Adjective'],
-    ];
-
-    for (const [term, definition, example, category] of sampleWords) {
-      db.run(
-        `INSERT INTO words (term, definition, example, category, created_at)
-         VALUES (?, ?, ?, ?, datetime('now', 'localtime'))`,
-        [term, definition, example, category]
-      );
+// Load DB from disk
+function load() {
+  try {
+    if (fs.existsSync(DB_PATH)) {
+      return JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
     }
+  } catch (e) {
+    console.error("DB load error:", e.message);
   }
-
-  save();
-  console.log('Database initialized at', DB_PATH);
+  return emptyDB();
 }
 
 // Save DB to disk
-function save() {
-  if (db) {
-    const data = db.export();
-    fs.writeFileSync(DB_PATH, Buffer.from(data));
+function save(db) {
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
+  } catch (e) {
+    console.error("DB save error:", e.message);
   }
 }
 
-// Helper: run a query and get all rows as objects
-function all(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  const rows = [];
-  while (stmt.step()) {
-    rows.push(stmt.getAsObject());
+// Seed sample words if empty
+function seedIfEmpty(db) {
+  if (db.words.length > 0) return db;
+
+  const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const samples = [
+    [
+      "Ephemeral",
+      "Lasting for a very short time",
+      "The ephemeral beauty of cherry blossoms.",
+      "Adjective",
+    ],
+    [
+      "Ubiquitous",
+      "Present everywhere at the same time",
+      "Smartphones have become ubiquitous.",
+      "Adjective",
+    ],
+    [
+      "Resilient",
+      "Able to recover quickly from difficulties",
+      "She is a resilient person who never gives up.",
+      "Adjective",
+    ],
+    [
+      "Eloquent",
+      "Fluent or persuasive in speaking",
+      "The lawyer made an eloquent argument.",
+      "Adjective",
+    ],
+    [
+      "Benevolent",
+      "Well-meaning and kindly",
+      "A benevolent leader cares for his people.",
+      "Adjective",
+    ],
+    [
+      "Ambiguous",
+      "Open to more than one interpretation",
+      "The instructions were ambiguous.",
+      "Adjective",
+    ],
+    [
+      "Diligent",
+      "Having or showing care and effort",
+      "She was diligent in her studies.",
+      "Adjective",
+    ],
+    [
+      "Pragmatic",
+      "Dealing with things sensibly",
+      "A pragmatic approach to problem solving.",
+      "Adjective",
+    ],
+  ];
+
+  for (const [term, definition, example, category] of samples) {
+    db.words.push({
+      id: db.nextWordId++,
+      term,
+      definition,
+      example,
+      category,
+      created_at: now,
+    });
   }
-  stmt.free();
-  return rows;
+
+  save(db);
+  return db;
 }
 
-// Helper: run a query and get one row
-function get(sql, params = []) {
-  const rows = all(sql, params);
-  return rows[0] || null;
+// Initialize
+let _db = load();
+_db = seedIfEmpty(_db);
+
+// --- Public API ---
+
+function getDB() {
+  return _db;
 }
 
-// Helper: run an INSERT/UPDATE/DELETE and return lastInsertRowid
-function run(sql, params = []) {
-  db.run(sql, params);
-  const rowid = db.exec('SELECT last_insert_rowid() as id')[0];
-  const lastInsertRowid = rowid ? rowid.values[0][0] : null;
-  save();
-  return { lastInsertRowid };
+// Words
+function getAllWords({ date, category, search } = {}) {
+  let words = _db.words;
+  if (date) words = words.filter((w) => w.created_at.startsWith(date));
+  if (category && category !== "All")
+    words = words.filter((w) => w.category === category);
+  if (search) {
+    const q = search.toLowerCase();
+    words = words.filter(
+      (w) =>
+        w.term.toLowerCase().includes(q) ||
+        w.definition.toLowerCase().includes(q),
+    );
+  }
+  return [...words].reverse(); // newest first
 }
 
-module.exports = { initDB, getDB, all, get, run, save };
+function getWordsByDate() {
+  const map = {};
+  for (const w of _db.words) {
+    const date = w.created_at.slice(0, 10);
+    map[date] = (map[date] || 0) + 1;
+  }
+  return Object.entries(map)
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, 30)
+    .map(([date, count]) => ({ date, count }));
+}
+
+function getCategories() {
+  return [...new Set(_db.words.map((w) => w.category))].sort();
+}
+
+function addWord({ term, definition, example = "", category = "General" }) {
+  const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const word = {
+    id: _db.nextWordId++,
+    term: term.trim(),
+    definition: definition.trim(),
+    example: example.trim(),
+    category: category.trim(),
+    created_at: now,
+  };
+  _db.words.push(word);
+  save(_db);
+  return word;
+}
+
+function updateWord(
+  id,
+  { term, definition, example = "", category = "General" },
+) {
+  const idx = _db.words.findIndex((w) => w.id === Number(id));
+  if (idx === -1) return null;
+  _db.words[idx] = {
+    ..._db.words[idx],
+    term: term.trim(),
+    definition: definition.trim(),
+    example: example.trim(),
+    category: category.trim(),
+  };
+  save(_db);
+  return _db.words[idx];
+}
+
+function deleteWord(id) {
+  const before = _db.words.length;
+  _db.words = _db.words.filter((w) => w.id !== Number(id));
+  if (_db.words.length < before) {
+    save(_db);
+    return true;
+  }
+  return false;
+}
+
+// Test Results
+function getAllTestResults() {
+  return [..._db.testResults].reverse().slice(0, 50);
+}
+
+function getTestStats() {
+  const results = _db.testResults;
+  if (!results.length) return { total_tests: 0, avg_score: 0, best_score: 0 };
+  const pcts = results.map((r) => (r.score / r.total) * 100);
+  return {
+    total_tests: results.length,
+    avg_score: pcts.reduce((a, b) => a + b, 0) / pcts.length,
+    best_score: Math.max(...pcts),
+  };
+}
+
+function addTestResult({ score, total, duration, mode = "test" }) {
+  const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const result = {
+    id: _db.nextTestId++,
+    score: Number(score),
+    total: Number(total),
+    duration: Number(duration),
+    mode,
+    created_at: now,
+  };
+  _db.testResults.push(result);
+  save(_db);
+  return result;
+}
+
+module.exports = {
+  getAllWords,
+  getWordsByDate,
+  getCategories,
+  addWord,
+  updateWord,
+  deleteWord,
+  getAllTestResults,
+  getTestStats,
+  addTestResult,
+};
